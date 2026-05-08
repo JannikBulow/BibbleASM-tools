@@ -21,6 +21,8 @@ namespace bibbleasm::lsp {
     private:
         std::istream& mIn;
         std::ostream& mOut;
+
+        std::string readLine();
     };
 }
 
