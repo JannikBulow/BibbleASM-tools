@@ -1,0 +1,214 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Bibble Assembly",
+  "scopeName": "source.basm",
+  "fileTypes": [
+    "basm"
+  ],
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#segment_directive"
+    },
+    {
+      "include": "#constpool_directive"
+    },
+    {
+      "include": "#class_directive"
+    },
+    {
+      "include": "#function_directive"
+    },
+    {
+      "include": "#code_block"
+    },
+    {
+      "include": "#label"
+    },
+    {
+      "include": "#instruction"
+    },
+    {
+      "include": "#register"
+    },
+    {
+      "include": "#constant_index"
+    },
+    {
+      "include": "#number"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "include": "#type"
+    },
+    {
+      "include": "#size"
+    },
+    {
+      "include": "#punctuation"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.semicolon.basm",
+      "match": ";.*$"
+    },
+    "segment_directive": {
+      "comment": "The 'segment' keyword followed by a segment name like .module, .constpool, .class, .function",
+      "match": "\\b(segment)\\b(\\s+)(\\.(?:module|constpool|class|function)\\b)?",
+      "captures": {
+        "1": {
+          "name": "keyword.control.segment.basm"
+        },
+        "3": {
+          "name": "entity.name.section.basm"
+        }
+      }
+    },
+    "constpool_directive": {
+      "comment": "Constant pool entry type keywords",
+      "match": "\\b(cp_byte|cp_short|cp_int|cp_long|cp_float|cp_double|string|module_info|class_info|field_info|method_info|function_info)\\b",
+      "captures": {
+        "1": {
+          "name": "keyword.other.constpool.basm"
+        }
+      }
+    },
+    "class_directive": {
+      "comment": "Class segment body directives",
+      "match": "\\b(name|superclass|field|method)\\b",
+      "captures": {
+        "1": {
+          "name": "keyword.other.directive.basm"
+        }
+      }
+    },
+    "function_directive": {
+      "comment": "Function segment header directives (not code/endcode, handled separately)",
+      "match": "\\b(version|flags|registers|parameters)\\b",
+      "captures": {
+        "1": {
+          "name": "keyword.other.directive.basm"
+        }
+      }
+    },
+    "code_block": {
+      "comment": "code/endcode delimiters",
+      "match": "\\b(code|endcode)\\b",
+      "captures": {
+        "1": {
+          "name": "keyword.control.code.basm"
+        }
+      }
+    },
+    "label": {
+      "comment": "Label definition: identifier followed by a colon",
+      "match": "^\\s*([A-Za-z_][A-Za-z0-9_.]*)(\\s*)(:)",
+      "captures": {
+        "1": {
+          "name": "entity.name.label.basm"
+        },
+        "3": {
+          "name": "punctuation.definition.label.basm"
+        }
+      }
+    },
+    "instruction": {
+      "comment": "All recognised opcodes",
+      "match": "\\b(nop|mov_range|mov|swap|load_const|load_imm|add|sub|mul|sdiv|udiv|smod|umod|neg|abs|and|or|xor|not|shl|shr|sar|fadd|fsub|fmul|fdiv|fneg|fabs|tr8|tr16|tr32|sex8|sex16|sex32|zex8|zex16|zex32|i2f|u2f|i2d|u2d|f2i|f2u|d2i|d2u|f2d|d2f|icmp|ucmp|fcmp|strcmp|inc|dec|jmp|jeq|jne|jlt|jle|jgt|jge|newinstance|newarray|newstring|newfuture|objkind|iskind|instanceof|getfield|setfield|dispatchmethod|getclass|arraylength|arrayget|arrayset|strlength|strget|str2array|resolve|cancel|isfutureready|poll|await|tail_call_dyn|tail_call|callap_dyn|callarp_dyn|calla_dyn|call_dyn|callap|callarp|calla|call|return|yield)\\b",
+      "captures": {
+        "1": {
+          "name": "keyword.operator.instruction.basm"
+        }
+      }
+    },
+    "register": {
+      "comment": "Register references: r0, r1, r12, etc.",
+      "match": "\\br([0-9]+)\\b",
+      "captures": {
+        "0": {
+          "name": "variable.other.register.basm"
+        }
+      }
+    },
+    "constant_index": {
+      "comment": "Constant pool index reference: #0, #42",
+      "match": "#[0-9]+",
+      "captures": {
+        "0": {
+          "name": "constant.other.index.basm"
+        }
+      }
+    },
+    "number": {
+      "patterns": [
+        {
+          "comment": "Hexadecimal integer: 0x1F, -0xFF",
+          "name": "constant.numeric.hex.basm",
+          "match": "-?0x[0-9A-Fa-f]+"
+        },
+        {
+          "comment": "Binary integer: 0b101",
+          "name": "constant.numeric.binary.basm",
+          "match": "-?0b[01]+"
+        },
+        {
+          "comment": "Octal integer: 0755",
+          "name": "constant.numeric.octal.basm",
+          "match": "-?0[0-7]+"
+        },
+        {
+          "comment": "Decimal integer (signed or unsigned)",
+          "name": "constant.numeric.integer.basm",
+          "match": "-?[0-9]+"
+        }
+      ]
+    },
+    "string": {
+      "comment": "Double-quoted string literal with escape sequences",
+      "name": "string.quoted.double.basm",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.basm",
+          "match": "\\\\[n'\\\\0]"
+        }
+      ]
+    },
+    "type": {
+      "comment": "Value type names used in field declarations and instructions",
+      "match": "\\b(byte|ubyte|short|ushort|int|uint|long|ulong|float|double|handle|reference)\\b",
+      "captures": {
+        "1": {
+          "name": "storage.type.basm"
+        }
+      }
+    },
+    "size": {
+      "comment": "Size specifiers BYTE, SHORT, INT, LONG",
+      "match": "\\b(BYTE|SHORT|INT|LONG)\\b",
+      "captures": {
+        "1": {
+          "name": "storage.modifier.size.basm"
+        }
+      }
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.separator.comma.basm",
+          "match": ","
+        },
+        {
+          "name": "punctuation.separator.colon.basm",
+          "match": ":"
+        }
+      ]
+    }
+  }
+}

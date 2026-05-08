@@ -1,0 +1,19 @@
+{
+  "name": "basm",
+  "contributes": {
+    "languages": [
+      {
+        "id": "basm",
+        "extensions": [".basm"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "basm",
+        "scopeName": "source.basm",
+        "path": "./syntaxes/basm.tmLanguage.json"
+      }
+    ]
+  }
+}
