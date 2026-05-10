@@ -3,8 +3,11 @@
 #ifndef BIBBLEASM_LSP_DOCUMENT_STORE_H
 #define BIBBLEASM_LSP_DOCUMENT_STORE_H 1
 
+#include <BibbleASM/error/error_reporter.h>
+
 #include <BibbleASM/lexer/lexer.h>
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -44,6 +47,18 @@ namespace bibbleasm::lsp {
         const ParsedDocument* get(const std::string& uri);
 
     private:
+        class ErrorReporter : public IErrorReporter {
+        public:
+            explicit ErrorReporter(ParsedDocument& doc);
+
+            void handleQueuedErrors() override;
+            void warning(ErrorContext ctx) override;
+            void error(ErrorContext ctx) override;
+
+        private:
+            ParsedDocument& mDoc;
+        };
+
         std::unordered_map<std::string, ParsedDocument> mDocuments;
 
         ParsedDocument& parse(std::string uri, std::string text);

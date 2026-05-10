@@ -55,6 +55,27 @@ namespace bibbleasm::lsp {
         return &it->second;
     }
 
+    DocumentStore::ErrorReporter::ErrorReporter(ParsedDocument& doc)
+        : mDoc(doc) {}
+
+    void DocumentStore::ErrorReporter::handleQueuedErrors() {}
+
+    void DocumentStore::ErrorReporter::warning(ErrorContext ctx) {
+        mDoc.diagnostics.push_back({
+            .range = TokenRange(ctx.token.getSourceLocation(), ctx.token.getText().length()),
+            .severity = 2,
+            .message = ctx.message
+        });
+    }
+
+    void DocumentStore::ErrorReporter::error(ErrorContext ctx) {
+        mDoc.diagnostics.push_back({
+            .range = TokenRange(ctx.token.getSourceLocation(), ctx.token.getText().length()),
+            .severity = 1,
+            .message = ctx.message
+        });
+    }
+
     ParsedDocument& DocumentStore::parse(std::string uri, std::string text) {
         ParsedDocument& doc = mDocuments[uri];
         doc.uri = std::move(uri);
@@ -77,18 +98,9 @@ namespace bibbleasm::lsp {
         }
 
         std::vector<Token> tokensCopy = doc.tokens;
-        //TODO: make bibbleasm parser use exceptions, then catch them properly here
-        try {
-            Parser parser(doc.uri, tokensCopy);
-            parser.parse();
-        } catch (const std::exception& e) {
-            // This should be collecting more data through special parser exceptions
-            doc.diagnostics.push_back({
-                .range = {{0, 0}, {0, 0}},
-                .severity = 1,
-                .message = e.what()
-            });
-        }
+        ErrorReporter errorReporter(doc);
+        Parser parser(doc.uri, tokensCopy, errorReporter);
+        parser.parse();
 
         return doc;
     }
