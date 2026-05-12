@@ -14,6 +14,8 @@ int main() {
         transport.sendMessage(msg);
     });
 
+    server.registerHandlers(dispatcher);
+
     while (!server.shouldExit()) {
         try {
             std::string message = transport.readMessage();
