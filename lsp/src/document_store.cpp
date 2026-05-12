@@ -80,6 +80,7 @@ namespace bibbleasm::lsp {
         ParsedDocument& doc = mDocuments[uri];
         doc.uri = std::move(uri);
         doc.text = std::move(text);
+        doc.text += '\n'; // I am too lazy to fix the lexer
         doc.tokens.clear();
         doc.diagnostics.clear();
 
