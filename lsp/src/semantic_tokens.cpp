@@ -5,6 +5,8 @@
 namespace bibbleasm::lsp {
     std::optional<SemanticTokenType> ToSemanticTokenType(TokenType tokenType) {
         switch (tokenType) {
+            case TokenType::Comment:    return SemanticTokenType::Comment;
+
             // Structural keywords
             case TokenType::Segment:    return SemanticTokenType::Keyword;
             case TokenType::Code:       return SemanticTokenType::Keyword;
@@ -35,7 +37,7 @@ namespace bibbleasm::lsp {
             case TokenType::Parameters: return SemanticTokenType::Decorator;
 
             // Opcodes
-            case TokenType::Instruction: return SemanticTokenType::Instruction;
+            case TokenType::Instruction: return SemanticTokenType::Keyword;
 
             // Registers: r0, r1, ...
             case TokenType::Register:   return SemanticTokenType::Variable;
@@ -100,27 +102,6 @@ namespace bibbleasm::lsp {
             return loc.column > 0 ? loc.column - 1 : 0;
         };
 
-        auto rawLength = [&](const Token& token) -> uint32_t {
-            if (token.getType() == TokenType::String) {
-                uint32_t line = 1, col = 1;
-                for (size_t i = 0; i < text.size(); ++i) {
-                    if (line == token.getSourceLocation().line && col == token.getSourceLocation().column) {
-                        size_t start = i; // opening '"'
-                        ++i;
-                        while (i < text.size() && text[i] != '"') {
-                            if (text[i] == '\\') ++i;
-                            ++i;
-                        }
-                        ++i;
-                        return static_cast<uint32_t>(i - start);
-                    }
-                    if (text[i] == '\n') { ++line; col = 1; } else { ++col; }
-                }
-                return 2;
-            }
-            return static_cast<uint32_t>(token.getText().size());
-        };
-
         for (size_t i = 0; i < n; i++) {
             const Token& token = tokens[i];
             TokenType type = token.getType();
@@ -130,7 +111,7 @@ namespace bibbleasm::lsp {
                     const Token& immToken = tokens[i + 1];
                     uint32_t line = lspLine(token.getSourceLocation());
                     uint32_t col = lspCol(token.getSourceLocation());
-                    uint32_t length = 1 + rawLength(immToken);
+                    uint32_t length = 1 + immToken.getRawLength();
                     emit(line, col, length, SemanticTokenType::EnumMember);
                     i++;
                 }
@@ -140,12 +121,12 @@ namespace bibbleasm::lsp {
             if (type == TokenType::Segment) {
                 uint32_t line = lspLine(token.getSourceLocation());
                 uint32_t col = lspCol(token.getSourceLocation());
-                emit(line, col, rawLength(token), SemanticTokenType::Keyword);
+                emit(line, col, token.getRawLength(), SemanticTokenType::Keyword);
 
                 if (i + 1 < n && tokens[i + 1].getType() == TokenType::Identifier) {
                     i++;
                     const Token& nameToken = tokens[i + 1];
-                    emit(lspLine(nameToken.getSourceLocation()), lspCol(nameToken.getSourceLocation()), rawLength(nameToken), SemanticTokenType::Namespace);
+                    emit(lspLine(nameToken.getSourceLocation()), lspCol(nameToken.getSourceLocation()), nameToken.getRawLength(), SemanticTokenType::Namespace);
                 }
 
                 continue;
@@ -155,7 +136,7 @@ namespace bibbleasm::lsp {
                 bool isLabelDef = (i + 1 < n && tokens[i + 1].getType() == TokenType::Colon);
                 SemanticTokenType semanticType = isLabelDef ? SemanticTokenType::Function : SemanticTokenType::Parameter;
 
-                emit(lspLine(token.getSourceLocation()), lspCol(token.getSourceLocation()), rawLength(token), semanticType);
+                emit(lspLine(token.getSourceLocation()), lspCol(token.getSourceLocation()), token.getRawLength(), semanticType);
 
                 if (isLabelDef) i++;
             }
@@ -163,7 +144,7 @@ namespace bibbleasm::lsp {
             std::optional<SemanticTokenType> semanticType = ToSemanticTokenType(token.getType());
             if (!semanticType.has_value()) continue;
 
-            emit(lspLine(token.getSourceLocation()), lspCol(token.getSourceLocation()), rawLength(token), semanticType.value());
+            emit(lspLine(token.getSourceLocation()), lspCol(token.getSourceLocation()), token.getRawLength(), semanticType.value());
         }
 
         return data;

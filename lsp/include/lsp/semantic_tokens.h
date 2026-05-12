@@ -15,22 +15,21 @@ namespace bibbleasm::lsp {
     using json = nlohmann::json;
 
     enum class SemanticTokenType : uint32_t {
-        Keyword     = 0,   // 'segment', 'code', 'endcode'
-        Variable    = 1,   // registers: r0, r1, ...
-        Namespace   = 2,   // segment names: .module, .constpool, .class, .function
-        Function    = 3,   // label definitions
-        Number      = 4,   // immediate literals
-        String      = 5,   // string literals
-        Type        = 6,   // byte, int, float, reference, ...
-        Macro       = 7,   // constpool directives: cp_int, string, module_info, ...
-        Decorator   = 8,   // body directives: name, field, method, flags, registers, ...
-        EnumMember  = 9,   // constant pool index references: #0, #42
-        Comment     = 10,  // ; line comments
-        Parameter   = 11,  // label references (branch targets)
-        Instruction = 12,  // opcodes: add, mov, call, ...
+        Keyword     = 0,   // 'segment', 'code', 'endcode', instructions, directives
+        Variable = 1, // registers: r0, r1, ...
+        Namespace = 2, // segment names: .module, .constpool, .class, .function
+        Function = 3, // label definitions
+        Number = 4, // immediate literals
+        String = 5, // string literals
+        Type = 6, // byte, int, float, reference, ...
+        Macro = 7, // constpool directives: cp_int, string, module_info, ...
+        Decorator = 8, // body directives: name, field, method, flags, ...
+        EnumMember = 9, // constant pool index references: #0, #42
+        Comment = 10, // ; line comments
+        Parameter = 11, // label references (branch targets)
     };
 
-    inline constexpr std::array<const char*, 13> tokenTypeLegend = {
+    inline constexpr std::array<const char*, 12> tokenTypeLegend = {
         "keyword",
         "variable",
         "namespace",
@@ -43,7 +42,6 @@ namespace bibbleasm::lsp {
         "enumMember",
         "comment",
         "parameter",
-        "instruction",  // custom type; editors that don't know it fall back to default
     };
 
     std::optional<SemanticTokenType> ToSemanticTokenType(TokenType tokenType);
