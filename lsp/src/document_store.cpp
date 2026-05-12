@@ -15,28 +15,6 @@ namespace bibbleasm::lsp {
         return {begin, end};
     }
 
-    static uint32_t GetTokenLength(const Token& token, const std::string& text) {
-        if (token.getType() == TokenType::String) {
-            uint32_t line = 1, col = 1;
-            for (size_t i = 0; i < text.size(); ++i) {
-                if (line == token.getSourceLocation().line && col == token.getSourceLocation().column) {
-                    size_t start = i;
-                    ++i;
-                    while (i < text.size() && text[i] != '"') {
-                        if (text[i] == '\\') ++i;
-                        ++i;
-                    }
-                    ++i;
-                    return static_cast<uint32_t>(i - start);
-                }
-                if (text[i] == '\n') { ++line; col = 1; } else { ++col; }
-            }
-            return 2;
-        }
-
-        return static_cast<uint32_t>(token.getText().size());
-    }
-
     const ParsedDocument& DocumentStore::open(std::string uri, std::string text) {
         return parse(std::move(uri), std::move(text));
     }
