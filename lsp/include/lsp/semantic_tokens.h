@@ -15,7 +15,7 @@ namespace bibbleasm::lsp {
     using json = nlohmann::json;
 
     enum class SemanticTokenType : uint32_t {
-        Keyword     = 0,   // 'segment', 'code', 'endcode', instructions, directives
+        Keyword = 0,   // 'segment', 'code', 'endcode', instructions, directives
         Variable = 1, // registers: r0, r1, ...
         Namespace = 2, // segment names: .module, .constpool, .class, .function
         Function = 3, // label definitions
