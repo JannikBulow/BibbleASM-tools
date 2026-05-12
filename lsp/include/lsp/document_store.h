@@ -16,7 +16,7 @@
 namespace bibbleasm::lsp {
     struct LspPosition {
         uint32_t line; // 0 indexed
-        uint32_t character; // 0 indexed utf16 code unit offset
+        uint32_t character; // 0 indexed utf16 code unit offset, though we don't use utf16 in basm so it actually refers to an ascii character index
     };
 
     struct LspRange {
