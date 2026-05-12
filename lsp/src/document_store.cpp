@@ -67,9 +67,8 @@ namespace bibbleasm::lsp {
 
         for (const Token& token : doc.tokens) {
             if (token.getType() == TokenType::Error) {
-                uint32_t length = 1;
                 doc.diagnostics.push_back({
-                    .range = TokenRange(token.getSourceLocation(), length),
+                    .range = TokenRange(token.getSourceLocation(), 1),
                     .severity = 1,
                     .message = "unexpected character: '" + token.getText() + "'"
                 });
